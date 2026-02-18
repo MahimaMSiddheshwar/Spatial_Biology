@@ -1,5 +1,6 @@
-# Python
+# Python cache and environment
 __pycache__/
+.ipynb_checkpoints/
 *.py[cod]
 *.pyo
 *.pyd
@@ -7,41 +8,33 @@ __pycache__/
 venv/
 .env
 
-# Editors and OS
-.vscode/
-.idea/
+# OS / editor files
 .DS_Store
 Thumbs.db
+.vscode/
+.idea/
 
-# Large spatial biology data (keep folder structure only)
+# Raw and processed data (local only)
 data/raw/**
 !data/raw/**/
-!data/raw/**/.gitkeep
 
 data/processed/**
 !data/processed/**/
-!data/processed/**/.gitkeep
 
-# Generated outputs
+# Results and figures (generated)
 results/**
 !results/**/
-!results/**/.gitkeep
 
 figures/**
 !figures/**/
-!figures/**/.gitkeep
 
-logs/**
-!logs/**/
-!logs/**/.gitkeep
-
-# Large model and matrix artifacts
+# Large binary and model artifacts
 *.h5
 *.h5ad
 *.loom
 *.mtx
-*.npy
 *.npz
+*.npy
 *.pkl
 *.joblib
 *.parquet
@@ -50,3 +43,9 @@ logs/**
 *.tar.gz
 *.gz
 *.zip
+*.png
+*.jpg
+*.jpeg
+*.tif
+*.tiff
+*.pdf
