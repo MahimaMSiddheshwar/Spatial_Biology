@@ -21,13 +21,6 @@ data/raw/**
 data/processed/**
 !data/processed/**/
 
-# Results and figures (generated)
-results/**
-!results/**/
-
-figures/**
-!figures/**/
-
 # Large binary and model artifacts
 *.h5
 *.h5ad
@@ -43,9 +36,5 @@ figures/**
 *.tar.gz
 *.gz
 *.zip
-*.png
-*.jpg
-*.jpeg
-*.tif
-*.tiff
-*.pdf
+
+# Note: we do NOT ignore figures/results outputs (e.g. PNG/PDF) so they can be committed.
