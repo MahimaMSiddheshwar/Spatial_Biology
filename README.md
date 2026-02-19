@@ -5,7 +5,7 @@
 ![Scanpy](https://img.shields.io/badge/Scanpy-1.x-green?style=flat-square)
 ![Squidpy](https://img.shields.io/badge/Squidpy-1.x-orange?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey?style=flat-square)
-![Status](https://img.shields.io/badge/Status-Complete-green?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Complete-darkgreen?style=flat-square)
 
 ---
 
