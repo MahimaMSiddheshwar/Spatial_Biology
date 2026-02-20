@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spatial Transcriptomics · Human Breast Cancer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+      /* ════════════════════════════════════
+   DESIGN TOKENS
+════════════════════════════════════ */
+      :root {
+        --white: #ffffff;
+        --bg: #fafaf8;
+        --bg2: #f4f3ef;
+        --surface: #ffffff;
+        --ink: #1a1a18;
+        --ink2: #3a3a36;
+        --ink3: #6b6b65;
+        --rule: #e5e4de;
+        --rule2: #d0cfc8;
+
+        /* Accent palette — muted academic tones */
+        --teal: #0f7b6c;
+        --teal-lt: #e8f5f3;
+        --navy: #1d3557;
+        --navy-lt: #eef1f6;
+        --rust: #c1440e;
+        --rust-lt: #fdf0eb;
+        --plum: #6b3fa0;
+        --plum-lt: #f4eefb;
+        --olive: #5a6e1f;
+        --olive-lt: #f2f5e8;
+        --amber: #b5650d;
+        --amber-lt: #fdf4e7;
+
+        --r: 2px;
+        --shadow: 0 1px 4px rgba(0, 0, 0, .06), 0 4px 16px rgba(0, 0, 0, .04);
+        --shadow-lg: 0 2px 8px rgba(0, 0, 0, .08), 0 8px 32px rgba(0, 0, 0, .06);
+      }
+
+      /* ════════════════════════════════════
+   BASE
+════════════════════════════════════ */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        font-size: 16px;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: 'IBM Plex Sans', sans-serif;
+        font-weight: 300;
+        line-height: 1.75;
+      }
+
+      /* ════════════════════════════════════
+   NAV
+════════════════════════════════════ */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 52px;
+        background: rgba(250, 250, 248, .96);
+        border-bottom: 1px solid var(--rule);
+        backdrop-filter: blur(12px);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 40px;
+        z-index: 1000;
+      }
+
+      .nav-brand {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 10px;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+        color: var(--teal);
+        font-weight: 500;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 4px;
+      }
+
+      .nav-link {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9px;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        padding: 5px 11px;
+        color: var(--ink3);
+        border: 1px solid transparent;
+        text-decoration: none;
+        transition: all .18s;
+        cursor: pointer;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: var(--teal);
+        border-color: var(--teal);
+        background: var(--teal-lt);
+      }
+
+      /* ════════════════════════════════════
+   PROGRESS
+════════════════════════════════════ */
+      .prog-bar {
+        position: fixed;
+        top: 52px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--rule);
+        z-index: 999;
+      }
+
+      .prog-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--teal), var(--plum));
+        transition: width .15s;
+      }
+
+      /* ════════════════════════════════════
+   LAYOUT
+════════════════════════════════════ */
+      section {
+        padding: 96px 0 80px;
+        border-top: 1px solid var(--rule);
+      }
+
+      section:first-of-type {
+        border-top: none;
+      }
+
+      .container {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 48px;
+      }
+
+      .g2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+
+      .g3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+      }
+
+      .g4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+
+      .g12 {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 32px;
+      }
+
+      .g21 {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 32px;
+      }
+
+      /* ════════════════════════════════════
+   SECTION HEADERS
+════════════════════════════════════ */
+      .sec-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9px;
+        letter-spacing: .22em;
+        text-transform: uppercase;
+        color: var(--teal);
+        margin-bottom: 14px;
+        font-weight: 500;
+      }
+
+      .sec-eyebrow::before {
+        content: '';
+        width: 20px;
+        height: 1px;
+        background: var(--teal);
+      }
+
+      .sec-title {
+        font-family: 'Libre Baskerville', serif;
+        font-size: clamp(1.9rem, 3.5vw, 2.9rem);
+        line-height: 1.2;
+        color: var(--ink);
+        margin-bottom: 10px;
+      }
+
+      .sec-title em {
+        font-style: italic;
+        color: var(--teal);
+      }
+
+      .sec-desc {
+        font-size: .95rem;
+        color: var(--ink3);
+        margin-bottom: 48px;
+        max-width: 640px;
+        line-height: 1.8;
+      }
+
+      /* ════════════════════════════════════
+   HERO
+════════════════════════════════════ */
+      #hero {
+        min-height: 100vh;
+        background: var(--white);
+        display: flex;
+        align-items: center;
+        padding: 52px 0 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      #hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 50%;
+        height: 100%;
+        background:
+          repeating-linear-gradient(0deg,
+            transparent,
+            transparent 39px,
+            var(--rule) 39px,
+            var(--rule) 40px),
+          repeating-linear-gradient(90deg,
+            transparent,
+            transparent 39px,
+            var(--rule) 39px,
+            var(--rule) 40px);
+        opacity: .4;
+        pointer-events: none;
+      }
+
+      .hero-left {
+        flex: 1;
+        padding: 0 0 0 48px;
+        position: relative;
+        z-index: 1;
+        max-width: 580px;
+      }
+
+      .hero-kicker {
+        display: inline-block;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9px;
+        letter-spacing: .22em;
+        text-transform: uppercase;
+        color: var(--teal);
+        border: 1px solid var(--teal);
+        padding: 5px 14px;
+        margin-bottom: 24px;
+        animation: fadeUp .7s .1s both;
+      }
+
+      .hero-title {
+        font-family: 'Libre Baskerville', serif;
+        font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+        line-height: 1.12;
+        color: var(--ink);
+        margin-bottom: 18px;
+        animation: fadeUp .7s .2s both;
+      }
+
+      .hero-title span {
+        color: var(--teal);
+      }
+
+      .hero-sub {
+        font-size: .97rem;
+        color: var(--ink3);
+        line-height: 1.85;
+        margin-bottom: 40px;
+        animation: fadeUp .7s .35s both;
+      }
+
+      .hero-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        animation: fadeUp .7s .5s both;
+      }
+
+      .chip {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9.5px;
+        padding: 5px 12px;
+        border: 1px solid var(--rule2);
+        background: var(--bg2);
+        color: var(--ink2);
+        letter-spacing: .06em;
+      }
+
+      .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1px;
+        background: var(--rule);
+        margin-top: 40px;
+        animation: fadeUp .7s .6s both;
+      }
+
+      .hs-item {
+        background: var(--white);
+        padding: 18px 20px;
+      }
+
+      .hs-num {
+        font-family: 'Libre Baskerville', serif;
+        font-size: 1.9rem;
+        color: var(--teal);
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+
+      .hs-lbl {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 8.5px;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: var(--ink3);
+      }
+
+      /* ════════════════════════════════════
+   CARDS
+════════════════════════════════════ */
+      .card {
+        background: var(--white);
+        border: 1px solid var(--rule);
+        padding: 24px;
+        transition: all .2s;
+        box-shadow: var(--shadow);
+      }
+
+      .card:hover {
+        border-color: var(--rule2);
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+      }
+
+      .card-num {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 10px;
+        letter-spacing: .1em;
+        color: var(--ink3);
+        margin-bottom: 10px;
+        text-transform: uppercase;
+      }
+
+      .card-title {
+        font-family: 'Libre Baskerville', serif;
+        font-size: 1.05rem;
+        color: var(--ink);
+        margin-bottom: 10px;
+        line-height: 1.3;
+      }
+
+      .card-body {
+        font-size: .88rem;
+        color: var(--ink2);
+        line-height: 1.75;
+      }
+
+      /* ════════════════════════════════════
+   STAT BLOCKS
+════════════════════════════════════ */
+      .stat-block {
+        background: var(--white);
+        border: 1px solid var(--rule);
+        padding: 20px;
+        text-align: center;
+        box-shadow: var(--shadow);
+      }
+
+      .sb-num {
+        font-family: 'Libre Baskerville', serif;
+        font-size: 2.1rem;
+        line-height: 1;
+        margin-bottom: 6px;
+      }
+
+      .sb-lbl {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 8px;
+        letter-spacing: .15em;
+        text-transform: uppercase;
+        color: var(--ink3);
+      }
+
+      /* ════════════════════════════════════
+   FIGURE SYSTEM
+════════════════════════════════════ */
+      .fig-wrapper {
+        background: var(--white);
+        border: 1px solid var(--rule);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+      }
+
+      .fig-img-slot {
+        width: 100%;
+        min-height: 240px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .fig-img-slot img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+      }
+
+      .fig-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 28px;
+        text-align: center;
+      }
+
+      .fig-placeholder-icon {
+        width: 48px;
+        height: 48px;
+        border: 1px dashed var(--rule2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: var(--ink3);
+      }
+
+      .fig-placeholder-text {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9px;
+        color: var(--ink3);
+        letter-spacing: .08em;
+        line-height: 1.7;
+      }
+
+      .fig-placeholder-file {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 8.5px;
+        color: var(--teal);
+        background: var(--teal-lt);
+        padding: 3px 8px;
+        margin-top: 4px;
+        display: inline-block;
+      }
+
+      .fig-meta {
+        padding: 14px 16px;
+        border-top: 1px solid var(--rule);
+        background: var(--white);
+      }
+
+      .fig-label {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9px;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--teal);
+        margin-bottom: 4px;
+        font-weight: 500;
+      }
+
+      .fig-caption {
+        font-size: .82rem;
+        color: var(--ink3);
+        line-height: 1.65;
+      }
+
+      /* ════════════════════════════════════
+   METHOD STEPS
+════════════════════════════════════ */
+      .method-card {
+        background: var(--white);
+        border: 1px solid var(--rule);
+        border-left: 3px solid var(--step-c, var(--teal));
+        padding: 22px 24px;
+        margin-bottom: 14px;
+        box-shadow: var(--shadow);
+        transition: all .2s;
+      }
+
+      .method-card:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateX(2px);
+      }
+
+      .mc-header {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        margin-bottom: 10px;
+      }
+
+      .mc-num {
+        font-family: 'Libre Baskerville', serif;
+        font-size: 1.5rem;
+        color: var(--step-c, var(--teal));
+        opacity: .35;
+        flex-shrink: 0;
+        line-height: 1;
+      }
+
+      .mc-title {
+        font-family: 'Libre Baskerville', serif;
+        font-size: 1rem;
+        color: var(--ink);
+      }
+
+      .mc-body {
+        font-size: .87rem;
+        color: var(--ink2);
+        line-height: 1.78;
+        margin-bottom: 10px;
+      }
+
+      .mc-why {
+        background: var(--amber-lt);
+        border-left: 2px solid var(--amber);
+        padding: 8px 12px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9px;
+        color: var(--ink2);
+        line-height: 1.75;
+        margin-bottom: 8px;
+      }
+
+      .mc-result {
+        background: var(--teal-lt);
+        border-left: 2px solid var(--teal);
+        padding: 8px 12px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 9px;
+        color: var(--teal);
+        line-height: 1.75;
+      }
+
+      /* ════════════════════════════════════
+   FINDINGS
+════════════════════════════════════ */
+      .finding-card {
+        display: grid;
+        grid-template-columns: 48px 1fr;
+        gap: 20px;
+        background: var(--white);
+        border: 1px solid var(--rule);
+        border-left: 3px solid var(--fc, var(--teal));
+        padding: 20px 24px;
+        margin-bottom: 12px;
+        box-shadow: var(--shadow);
+        transition: all .2s;
+      }
+
+      .finding-card:hover {
+        box-shadow: var(--shadow-lg);
+      }
+
+      .fc-num {
+        font-family: 'Libre Baskerville', serif;
+        font-size: 2rem;
+        line-height: 1;
+        color: var(--fc, var(--teal));
+        opacity: .2;
+      }
+
+      .fc-title {
+        font-family: 'Libre Baskerville', serif;
+        font-size: .97rem;
+        color: var(--ink);
+        margin-bottom: 6px;
+      }
+
+      .fc-body {
+        font-size: .86rem;
+        color: var(--ink2);
+        line-height: 1.75;
+        margin-bottom: 8px;
+      }
+
+      .fc-evidence {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 8.5px;
+        color: var(--teal);
+        background: var(--teal-lt);
+        padding: 6px 10px;
+        line-height: 1.65;
+      }
+
+      /* ════════════════════════════════════
+   CALLOUTS
+════════════════════════════════════ */
+      .callout {
+        padding: 18px 22px;
+        border-left: 3px solid;
+        margin: 20px 0;
+        font-size: .88rem;
+        line-height: 1.8;
+      }
+
+      .callout.teal {
+        border-color: var(--teal);
+        background: var(--teal-lt);
+        color: var(--ink2);
+      }
+
+      .callout.amber {
+        border-color: var(--amber);
+        background: var(--amber-lt);
+        color: var(--ink2);
+      }
+
+      .callout.plum {
+        border-color: var(--plum);
+        background: var(--plum-lt);
+        color: var(--ink2);
+      }
+
+      .callout.rust {
+        border-color: var(--rust);
+        background: var(--rust-lt);
+        color: var(--ink2);
+      }
+
+      .callout.navy {
+        border-color: var(--navy);
+        background: var(--navy-lt);
+        color: var(--ink2);
+      }
+
+      /* ════════════════════════════════════
+   TABLES
+════════════════════════════════════ */
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .85rem;
+      }
+
+      .data-table th {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 8.5px;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        color: var(--ink3);
+        padding: 9px 14px;
+        text-align: left;
+        border-bottom: 2px solid var(--rule2);
+        font-weight: 400;
+      }
+
+      .data-table td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--rule);
+        color: var(--ink2);
+        vertical-align: top;
+        line-height: 1.5;
+      }
+
+      .data-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .data-table tr:hover td {
+        background: var(--bg2);
+      }
+
+      /* ════════════════════════════════════
+   PIPELINE FLOW
+════════════════════════════════════ */
+      .pipeline {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0;
+        margin: 28px 0;
+        background: var(--white);
+        border: 1px solid var(--rule);
+        padding: 20px;
+        box-shadow: var(--shadow);
+      }
+
+      .pipe-step {
+        text-align: center;
+        padding: 10px 16px;
+      }
+
+      .ps-num {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 8px;
+        letter-spacing: .15em;
+        color: var(--ink3);
+        margin-bottom: 4px;
+      }
+
+      .ps-name {
+        font-family: 'Libre Baskerville', serif;
+        font-size: .82rem;
+        color: var(--ink);
+      }
+
+      .ps-tool {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 7.5px;
+        color: var(--teal);
+        margin-top: 3px;
+      }
+
+      .pipe-arrow {
+        color: var(--rule2);
+        font-size: 18px;
+        padding: 0 4px;
+        flex-shrink: 0;
+      }
+
+      /* ════════════════════════════════════
+   TAGS
+════════════════════════════════════ */
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 12px;
+      }
+
+      .tag {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 8px;
+        padding: 3px 9px;
+        border: 1px solid var(--rule2);
+        color: var(--ink3);
+        letter-spacing: .06em;
+        text-transform: uppercase;
+      }
+
+      /* ════════════════════════════════════
+   DIVIDER
+════════════════════════════════════ */
+      .hr {
+        height: 1px;
+        background: var(--rule);
+        margin: 40px 0;
+      }
+
+      /* ════════════════════════════════════
+   ANIMATIONS
+════════════════════════════════════ */
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity .55s ease, transform .55s ease;
+      }
+
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ════════════════════════════════════
+   BACK TO TOP
+════════════════════════════════════ */
+      .back-top {
+        position: fixed;
+        bottom: 28px;
+        right: 28px;
+        width: 38px;
+        height: 38px;
+        background: var(--white);
+        border: 1px solid var(--rule2);
+        color: var(--teal);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        box-shadow: var(--shadow);
+        opacity: 0;
+        pointer-events: none;
+        transition: all .2s;
+        z-index: 999;
+      }
+
+      .back-top.show {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .back-top:hover {
+        background: var(--teal-lt);
+        border-color: var(--teal);
+      }
+
+      /* ════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════ */
+      @media(max-width:860px) {
+        .container {
+          padding: 0 24px;
+        }
+
+        .g2,
+        .g3,
+        .g4,
+        .g12,
+        .g21 {
+          grid-template-columns: 1fr;
+        }
+
+        .nav-links {
+          display: none;
+        }
+
+        #hero::before {
+          display: none;
+        }
+
+        .guide-steps {
+          grid-template-columns: 1fr;
+        }
+      }
+
+    </style>
+  </head>
+
+  <body>
+
+    <!-- Progress -->
+    <div class="prog-bar">
+      <div class="prog-fill" id="prog"></div>
+    </div>
+
+    <!-- Nav -->
+    <nav>
+      <div class="nav-brand">ST · Breast Cancer</div>
+      <div class="nav-links">
+        <a class="nav-link" href="#hero">Home</a>
+        <a class="nav-link" href="#overview">Overview</a>
+        <a class="nav-link" href="#dataset">Dataset</a>
+        <a class="nav-link" href="#workflow">Workflow</a>
+        <a class="nav-link" href="#results">Results</a>
+        <a class="nav-link" href="#discussion">Discussion</a>
+        <a class="nav-link" href="#conclusion">Conclusion</a>
+        <a class="nav-link" href="#future">Future</a>
+      </div>
+    </nav>
+
+    <!-- Back to top -->
+    <div class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+    <!-- ══════════════════════════════════
+     HERO
+══════════════════════════════════ -->
+    <section id="hero">
+      <div class="container" style="padding-top:40px;">
+        <div style="max-width:680px;">
+          <div class="hero-kicker">Personal Research Project · 2024–2025</div>
+          <h1 class="hero-title">Spatial Transcriptomics<br>of <span>Human Breast Cancer</span></h1>
+          <p class="hero-sub">
+            Mapping the tumor microenvironment at spatial resolution using 10x Genomics Visium —
+            resolving how cancer, stromal, and immune cells communicate across tissue space.
+          </p>
+          <div class="hero-chips">
+            <span class="chip">10x Genomics Visium v1.3.0</span>
+            <span class="chip">Scanpy · Squidpy</span>
+            <span class="chip">Python 3.13</span>
+            <span class="chip">Invasive Ductal Carcinoma</span>
+            <span class="chip">Open Source · Reproducible</span>
+          </div>
+          <div class="hero-stats">
+            <div class="hs-item">
+              <div class="hs-num">4,869</div>
+              <div class="hs-lbl">Tissue Spots</div>
+            </div>
+            <div class="hs-item">
+              <div class="hs-num">21,349</div>
+              <div class="hs-lbl">Genes Retained</div>
+            </div>
+            <div class="hs-item">
+              <div class="hs-num">9</div>
+              <div class="hs-lbl">Spatial Clusters</div>
+            </div>
+            <div class="hs-item">
+              <div class="hs-num">2,486</div>
+              <div class="hs-lbl">Spatially Variable Genes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════
+     HOW TO ADD YOUR FIGURES
+══════════════════════════════════ -->
+    <section id="figure-guide" style="padding:40px 0;background:var(--white);">
+      <div class="container">
+        <div class="guide-panel">
+          <div class="guide-title">📌 How To Add Your Generated Figures To This Presentation</div>
+          <div class="guide-steps">
+            <div class="guide-step">
+              <strong>OPTION A — Local (Recommended)</strong><br>
+              Put your figure files in the <strong>same folder</strong> as this HTML file,
+              then find each placeholder and replace it with an img tag.
+              <div class="guide-code">
+                <span class="gc">&lt;!-- FIND this block: --&gt;</span><br>
+                &lt;div class="fig-placeholder"&gt;<br>
+                &nbsp;&nbsp;...fig-placeholder-text...<br>
+                &lt;/div&gt;<br><br>
+                <span class="gc">&lt;!-- REPLACE with: --&gt;</span><br>
+                &lt;img <span class="gh">src</span>=<span class="ga">"your_figure.png"</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gh">alt</span>=<span class="ga">"Figure description"</span>&gt;
+              </div>
+            </div>
+            <div class="guide-step">
+              <strong>OPTION B — Vercel Deployment</strong><br>
+              Create a folder called <strong>figures/</strong> next to this HTML.
+              Put figures there. Reference as <code style="color:var(--teal)">src=&quot;figures/qc_violin.png&quot;</code>
+              <div class="guide-code">
+                my-project/<br>
+                ├── <span class="gh">index.html</span> &nbsp;← this file<br>
+                └── figures/<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="ga">qc_violin.png</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="ga">spatial_clusters.png</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="ga">umap_annotated.png</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;└── <span class="ga">pathway_heatmap.png</span><br><br>
+                <span class="gc"># Then reference as:</span><br>
+                src=<span class="ga">"figures/qc_violin.png"</span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink3);line-height:1.8;">
+            💡 Each figure slot below shows the <span style="color:var(--teal);background:var(--teal-lt);padding:1px 6px;">exact filename</span> from your project.
+            Just copy those files next to this HTML and update the src= attribute.
+            All placeholders are clearly marked — search for <code style="background:var(--bg2);padding:1px 6px;">fig-placeholder</code> in the HTML to find every slot.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════
+     OVERVIEW
+══════════════════════════════════ -->
+    <section id="overview">
+      <div class="container">
+
+        <div class="sec-eyebrow">01 · Biological Question</div>
+        <h2 class="sec-title reveal">Why <em>where</em> matters<br>as much as what</h2>
+        <p class="sec-desc reveal">The central question: can we map the molecular architecture of a breast cancer tumor and reveal how cancer, stromal, and immune cells communicate spatially — going beyond what bulk RNA-seq can ever tell us?</p>
+
+        <div class="g2 reveal" style="margin-bottom:24px;">
+          <div class="card">
+            <div class="card-num">The Problem</div>
+            <div class="card-title">Bulk RNA-seq Destroys Spatial Information</div>
+            <div class="card-body">Traditional bulk RNA-seq averages gene expression across thousands of cells, completely destroying spatial context. Yet cancer is a spatial disease — the biology at the hypoxic tumor core, the invasive margin, the immune exclusion zone, and the reactive stroma are completely different. Averaging them produces a signal that represents none of these regions accurately.</div>
+          </div>
+          <div class="card">
+            <div class="card-num">The Solution</div>
+            <div class="card-title">Spatial Transcriptomics Preserves Location</div>
+            <div class="card-body">10x Genomics Visium captures the whole transcriptome (33k+ genes) at every tissue spot while preserving XY coordinates. This lets us ask: which genes are spatially structured? Which cell types co-localize? Where do immune checkpoints activate? What signaling occurs at the tumor-stroma interface? Questions that require knowing <em>where</em>.</div>
+          </div>
+        </div>
+
+        <div class="card reveal" style="background:var(--navy-lt);border-color:var(--navy);border-left:3px solid var(--navy);">
+          <div class="card-num" style="color:var(--navy);">Research Objectives</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;">
+            <div style="font-size:.87rem;color:var(--ink2);line-height:1.7;"><span style="color:var(--teal);font-weight:500;">OBJ 1 →</span> Identify transcriptionally distinct spatial domains within the breast cancer TME</div>
+            <div style="font-size:.87rem;color:var(--ink2);line-height:1.7;"><span style="color:var(--teal);font-weight:500;">OBJ 2 →</span> Detect spatially variable genes driving regional expression patterns via Moran's I</div>
+            <div style="font-size:.87rem;color:var(--ink2);line-height:1.7;"><span style="color:var(--teal);font-weight:500;">OBJ 3 →</span> Deconvolve cell type composition per spot using curated gene signatures</div>
+            <div style="font-size:.87rem;color:var(--ink2);line-height:1.7;"><span style="color:var(--teal);font-weight:500;">OBJ 4 →</span> Map ligand-receptor interactions across 8 TME signaling pathways</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════
+     DATASET
+══════════════════════════════════ -->
+    <section id="dataset">
+      <div class="container">
+
+        <div class="sec-eyebrow">02 · Dataset</div>
+        <h2 class="sec-title reveal">10x Genomics Visium —<br><em>Human Breast Cancer</em></h2>
+        <p class="sec-desc reveal">Publicly available fresh-frozen IDC dataset (v1.3.0). Gold-standard quality confirmed by near-zero MT% and HB%.</p>
+
+        <div class="g4 reveal" style="margin-bottom:32px;">
+          <div class="stat-block">
+            <div class="sb-num" style="color:var(--teal)">4,869</div>
+            <div class="sb-lbl">Spots on Tissue</div>
+          </div>
+          <div class="stat-block">
+            <div class="sb-num" style="color:var(--navy)">21,349</div>
+            <div class="sb-lbl">Genes Retained</div>
+          </div>
+          <div class="stat-block">
+            <div class="sb-num" style="color:var(--plum)">9,720</div>
+            <div class="sb-lbl">Median UMI/Spot</div>
+          </div>
+          <div class="stat-block">
+            <div class="sb-num" style="color:var(--olive)">3.71%</div>
+            <div class="sb-lbl">Mean MT% (excellent)</div>
+          </div>
+        </div>
+
+        <div class="g21 reveal">
+          <div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th>Value</th>
+                  <th>Interpretation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Tissue Type</td>
+                  <td>Invasive Ductal Carcinoma</td>
+                  <td>Most common breast cancer subtype</td>
+                </tr>
+                <tr>
+                  <td>Preservation</td>
+                  <td>Fresh Frozen</td>
+                  <td>Best RNA quality; avoids FFPE degradation</td>
+                </tr>
+                <tr>
+                  <td>Spots on Tissue</td>
+                  <td>4,869 (of 4,898)</td>
+                  <td>Only 29 removed — 99.4% retention</td>
+                </tr>
+                <tr>
+                  <td>Genes Detected</td>
+                  <td>36,601 → 21,349</td>
+                  <td>15,252 low-expression genes filtered</td>
+                </tr>
+                <tr>
+                  <td>Median UMI/spot</td>
+                  <td>9,720</td>
+                  <td>Excellent sequencing depth</td>
+                </tr>
+                <tr>
+                  <td>Max UMI/spot</td>
+                  <td>54,830</td>
+                  <td>No doublet outliers detected</td>
+                </tr>
+                <tr>
+                  <td>MT% mean</td>
+                  <td>3.71% (max 14.31%)</td>
+                  <td>⭐ Exceptional cell viability</td>
+                </tr>
+                <tr>
+                  <td>HB% mean</td>
+                  <td>0.01%</td>
+                  <td>⭐ Zero blood contamination</td>
+                </tr>
+                <tr>
+                  <td>Ribo% mean</td>
+                  <td>15.18%</td>
+                  <td>Normal active protein synthesis</td>
+                </tr>
+                <tr>
+                  <td>Spot diameter</td>
+                  <td>55 µm (~8 cells)</td>
+                  <td>Spot-level resolution requires deconvolution</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="callout teal" style="margin-top:16px;font-size:.85rem;">
+              ⭐ <strong>Why this dataset is ideal:</strong> The near-zero HB% and low MT% confirm the biology we observe reflects genuine transcriptional programs — not technical artifacts from blood contamination or dying cells. With median 9,720 UMIs/spot, we have sufficient depth to detect even lowly expressed immune marker genes.
+            </div>
+          </div>
+          <div>
+            <!-- FIGURE 1 -->
+            <div class="fig-wrapper">
+              <div class="fig-img-slot" style="min-height:280px;">
+                <!-- ✏️ TO ADD YOUR FIGURE: delete the div below and add:
+               <img src="figures/spatial/02_spatial_qc.png" alt="Tissue Overview">
+          -->
+                <img src="figures/spatial/02_spatial_qc.png" alt="H&E Tissue + Spot Array QC Metrics Spatial Overlay">
+              </div>
+              <div class="fig-meta">
+                <div class="fig-label">Figure 1</div>
+                <div class="fig-caption">Visium spot array overlaid on H&E stained breast cancer tissue section. Each spot (55µm diameter) captures ~8 cells with full transcriptome profiling.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════
+     WORKFLOW
+══════════════════════════════════ -->
+    <section id="workflow">
+      <div class="container">
+
+        <div class="sec-eyebrow">03 · Analysis Workflow</div>
+        <h2 class="sec-title reveal">7-Phase End-to-End<br><em>Pipeline</em></h2>
+        <p class="sec-desc reveal">Every methodological choice made with biological reasoning — not just convention.</p>
+
+        <!-- Pipeline flow -->
+        <div class="pipeline reveal">
+          <div class="pipe-step">
+            <div class="ps-num">01</div>
+            <div class="ps-name">Data Setup</div>
+            <div class="ps-tool">AnnData</div>
+          </div>
+          <div class="pipe-arrow">›</div>
+          <div class="pipe-step">
+            <div class="ps-num">02</div>
+            <div class="ps-name">QC & Preprocess</div>
+            <div class="ps-tool">Scanpy</div>
+          </div>
+          <div class="pipe-arrow">›</div>
+          <div class="pipe-step">
+            <div class="ps-num">03</div>
+            <div class="ps-name">Clustering</div>
+            <div class="ps-tool">Leiden</div>
+          </div>
+          <div class="pipe-arrow">›</div>
+          <div class="pipe-step">
+            <div class="ps-num">04</div>
+            <div class="ps-name">Spatial Stats</div>
+            <div class="ps-tool">Squidpy</div>
+          </div>
+          <div class="pipe-arrow">›</div>
+          <div class="pipe-step">
+            <div class="ps-num">05</div>
+            <div class="ps-name">Deconvolution</div>
+            <div class="ps-tool">score_genes</div>
+          </div>
+          <div class="pipe-arrow">›</div>
+          <div class="pipe-step">
+            <div class="ps-num">06</div>
+            <div class="ps-name">Cell Comm.</div>
+            <div class="ps-tool">CellChatDB</div>
+          </div>
+          <div class="pipe-arrow">›</div>
+          <div class="pipe-step">
+            <div class="ps-num">07</div>
+            <div class="ps-name">Advanced</div>
+            <div class="ps-tool">PAM50 · PROGENy</div>
+          </div>
+        </div>
+
+        <!-- QC Steps -->
+        <h3 style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);margin:36px 0 14px;">Phase 01–02 · QC, Normalization & Clustering</h3>
+
+        <div class="method-card reveal" style="--step-c:var(--teal);">
+          <div class="mc-header">
+            <div class="mc-num">01</div>
+            <div class="mc-title">MT%, Ribosomal & HB Gene Annotation</div>
+          </div>
+          <div class="mc-body">Annotated mitochondrial (MT- prefix), ribosomal (RPS/RPL), and hemoglobin (HB pattern) genes. Computed per-spot QC metrics using <code>sc.pp.calculate_qc_metrics()</code>.</div>
+          <div class="mc-why">⚡ Why: MT% is the gold-standard cell viability proxy. High MT% indicates cytoplasmic RNA leakage from damaged/dead cells — a technical artifact that would masquerade as biology. HB% detects blood contamination from tissue processing. We annotate all three before filtering to make data-driven threshold decisions rather than using arbitrary defaults.</div>
+          <div class="mc-result">✓ Result: MT% max = 14.31% (below 15% threshold). HB% mean = 0.01% — zero blood contamination confirmed. Exceptional tissue preparation validated before any analysis proceeds.</div>
+        </div>
+
+        <div class="method-card reveal" style="--step-c:var(--teal);">
+          <div class="mc-header">
+            <div class="mc-num">02</div>
+            <div class="mc-title">Filtering: min_genes=200, min_counts=500, MT%&lt;15%, min_cells=3</div>
+          </div>
+          <div class="mc-body">Applied conservative, data-calibrated thresholds. Removed genes detected in fewer than 3 spots.</div>
+          <div class="mc-why">⚡ Why these specific thresholds: With median UMI=9,720, a min_counts=1,000 cutoff would over-filter low-coverage edge spots with genuine biology. The MT% maximum of 14.31% means a 15% threshold captures all outliers without sacrificing viable spots. Thresholds are always visualized on violin plots and calibrated to the actual data distribution — never copied from a tutorial without inspection.</div>
+          <div class="mc-result">✓ Result: 4,898 → 4,869 spots retained (only 29 removed = 0.6%). 36,601 → 21,349 genes. Near-zero attrition confirms the data quality was already excellent.</div>
+        </div>
+
+        <div class="method-card reveal" style="--step-c:var(--teal);">
+          <div class="mc-header">
+            <div class="mc-num">03</div>
+            <div class="mc-title">Normalization (CPM→10k) + Log1p + HVG Selection (Seurat v3)</div>
+          </div>
+          <div class="mc-body">Normalized to 10,000 counts/spot (library size normalization), log1p transformed. Raw counts preserved in <code>adata.layers['counts']</code>. Top 3,000 HVGs selected using Seurat v3 method with raw count input.</div>
+          <div class="mc-why">⚡ Why Seurat v3 HVG: Fits a negative binomial model to the mean-variance relationship in count data, then identifies genes with variance exceeding what their mean expression would predict. Unlike simple variance ranking, this approach identifies genes that are biologically variable — not just highly expressed. Raw counts passed to avoid double-normalization bias in variance estimation.</div>
+          <div class="mc-result">✓ Result: 3,000 HVGs selected. PCA on scaled HVGs: Top 30 PCs capture 16.9% variance — typical for spatially heterogeneous tissue where variation is distributed across many orthogonal gradients.</div>
+        </div>
+
+        <!-- FIGURE 2: QC Violins -->
+        <div class="g2 reveal" style="margin:24px 0;">
+          <div class="fig-wrapper">
+            <div class="fig-img-slot" style="min-height:220px;">
+              <!-- ✏️ REPLACE with: <img src="figures/qc/violin_01_qc_violin.png" alt="QC Violins"> -->
+              <img src="figures/qc/violin_01_qc_violin.png" alt="QC Violin Plots">
+            </div>
+            <div class="fig-meta">
+              <div class="fig-label">Figure 2</div>
+              <div class="fig-caption">Distribution of QC metrics per spot: total_counts, n_genes_by_counts, pct_counts_mt, pct_counts_ribo. Used to determine data-driven filtering thresholds.</div>
+            </div>
+          </div>
+          <div class="fig-wrapper">
+            <div class="fig-img-slot" style="min-height:220px;">
+              <!-- ✏️ REPLACE with: <img src="figures/qc/pca_variance_ratio_05_pca_variance.png" alt="PCA Variance"> -->
+              <img src="figures/qc/pca_variance_ratio_05_pca_variance.png" alt="PCA Variance Explained">
+            </div>
+            <div class="fig-meta">
+              <div class="fig-label">Figure 3</div>
+              <div class="fig-caption">Cumulative variance explained by PCA components. Distributed variance across 30+ PCs is characteristic of spatially heterogeneous tissue with continuous transcriptional gradients.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="method-card reveal" style="--step-c:var(--navy);">
+          <div class="mc-header">
+            <div class="mc-num">04</div>
+            <div class="mc-title">Leiden Clustering — Resolution Sweep (0.3 / 0.5 / 0.6 / 1.0)</div>
+          </div>
+          <div class="mc-body">kNN graph (k=15, 30 PCs) → UMAP embedding. Leiden clustering tested at 4 resolutions. Resolution 0.5 (9 clusters) selected based on spatial coherence on tissue.</div>
+          <div class="mc-why">⚡ Why Leiden over Louvain: Leiden guarantees well-connected communities by design, avoiding the fragmented clusters that Louvain sometimes produces. Why resolution selection is biology-first: The spatial plot — not the UMAP silhouette score — is the ground truth for spatial data. Resolution 0.5 produced clusters that align with histologically distinct tissue regions (tumor nests, fibrous stroma, immune zones). Resolution 1.0 over-split continuous stromal gradients into meaningless sub-clusters.</div>
+          <div class="mc-result">✓ Resolutions: 0.3→6 clusters | 0.5→9 clusters ✅ selected | 0.6→10 | 1.0→14 clusters</div>
+        </div>
+
+        <!-- FIGURE: Clusters -->
+        <div class="g2 reveal" style="margin:24px 0;">
+          <div class="fig-wrapper">
+            <div class="fig-img-slot" style="min-height:280px;">
+              <!-- ✏️ REPLACE with: <img src="figures/spatial/08_spatial_annotated_base.png" alt="Spatial Clusters"> -->
+              <img src="figures/spatial/08_spatial_annotated_base.png" alt="Leiden Clusters (res=0.5) on Tissue">
+            </div>
+            <div class="fig-meta">
+              <div class="fig-label">Figure 4</div>
+              <div class="fig-caption">Leiden clusters (resolution=0.5) overlaid on H&E tissue. 9 spatially coherent domains identified — cluster 3 (red) forms a dense, spatially confined carcinoma nest consistent with invasive ductal carcinoma morphology.</div>
+            </div>
+          </div>
+          <div class="fig-wrapper">
+            <div class="fig-img-slot" style="min-height:280px;">
+              <!-- ✏️ REPLACE with: <img src="figures/clustering/07_umap_annotated_pub.png" alt="UMAP Annotated"> -->
+              <img src="figures/clustering/07_umap_annotated_pub.png" alt="UMAP + Cluster Bar Chart">
+            </div>
+            <div class="fig-meta">
+              <div class="fig-label">Figure 5</div>
+              <div class="fig-caption">UMAP embedding (left) with cluster number labels on centroids. Spot count bar chart (right) shows each cluster's size and percentage of total tissue. Leiden res=0.5, 9 clusters, 4,869 spots.</div>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--plum);margin:36px 0 14px;">Phase 03–04 · Spatial Statistics & Deconvolution</h3>
+
+        <div class="method-card reveal" style="--step-c:var(--plum);">
+          <div class="mc-header">
+            <div class="mc-num">05</div>
+            <div class="mc-title">Moran's I Spatial Autocorrelation (n_perms=100, BH-FDR)</div>
+          </div>
+          <div class="mc-body">Computed Moran's I for all 21,349 genes using a hexagonal Visium spatial neighbors graph (coord_type='grid', 6 neighbors). Significance by permutation testing with Benjamini-Hochberg FDR correction.</div>
+          <div class="mc-why">⚡ Why Moran's I: It is the spatial equivalent of a correlation coefficient. I≈+1 means high-expression spots are surrounded by other high-expression spots (spatially clustered). I≈0 means random distribution. This is the only rigorous way to identify genes with spatially structured expression — rather than genes that are simply highly variable in an unstructured way. Permutation testing avoids parametric assumptions. BH-FDR controls the expected proportion of false discoveries among significant hits — the correct correction when testing 21,349 hypotheses simultaneously.</div>
+          <div class="mc-result">✓ 2,486 of 21,349 genes (11.6%) are significantly spatially variable (FDR &lt; 0.05). Top SVGs: MGP, IGLC2, IGHG3, IGKC, COX6C — the top 3 are immunoglobulins, suggesting spatially clustered plasma cells/B cells → TLS evidence.</div>
+        </div>
+
+        <div class="method-card reveal" style="--step-c:var(--plum);">
+          <div class="mc-header">
+            <div class="mc-num">06</div>
+            <div class="mc-title">Gene Signature Scoring — 24 Curated Signatures (sc.tl.score_genes)</div>
+          </div>
+          <div class="mc-body">Scored 24 cell type signatures covering tumor, stromal, immune, and functional categories. Gene sets from Wu et al. 2021 Nature Genetics breast cancer atlas and CellMarker 2.0.</div>
+          <div class="mc-why">⚡ Why signature scoring: Visium spots contain ~8 cells each — they are mixtures not pure cell types. sc.tl.score_genes scores each spot by comparing expression of the signature gene set against a random background of genes with similar expression levels. This controls for sequencing depth variation and reduces false positives from highly expressed housekeeping genes. Signatures from Wu et al. 2021 are breast cancer-specific — validated in 24 treatment-naive primary tumors — ensuring direct biological relevance to this dataset.</div>
+          <div class="mc-result">✓ 24 signatures scored: 5 tumor subtypes + 4 stromal + 11 immune + 4 special (TLS, Hypoxia, EMT, Exhausted T). Key finding: Plasma cell score maximum of 20.9 in Endothelial/Vascular cluster → perivascular TLS localization.</div>
+        </div>
+
+        <!-- FIGURE: SVG + Decon -->
+        <div class="g2 reveal" style="margin:24px 0;">
+          <div class="fig-wrapper">
+            <div class="fig-img-slot" style="min-height:220px;">
+              <!-- ✏️ REPLACE with: <img src="figures/svg/_01_top_svgs_spatial.png" alt="Top SVGs"> -->
+              <img src="figures/svg/_01_top_svgs_spatial.png" alt="Top 8 SVGs by Moran's I Spatial Expression Maps">
+            </div>
+            <div class="fig-meta">
+              <div class="fig-label">Figure 6</div>
+              <div class="fig-caption">Top 8 spatially variable genes ranked by Moran's I statistic. Three of the top 5 SVGs are immunoglobulin genes (IGLC2, IGHG3, IGKC), providing the first evidence for spatially clustered plasma cells consistent with TLS formation.</div>
+            </div>
+          </div>
+          <div class="fig-wrapper">
+            <div class="fig-img-slot" style="min-height:220px;">
+              <!-- ✏️ REPLACE with: <img src="figures/deconvolution/_04_TLS_signature.png" alt="TLS Signature"> -->
+              <img src="figures/deconvolution/_04_TLS_signature.png" alt="TLS Signature Spatial Map">
+            </div>
+            <div class="fig-meta">
+              <div class="fig-label">Figure 7 ⭐ Key Finding</div>
+              <div class="fig-caption">TLS signature score + Plasma cells + B cells + CD8 T cells spatially mapped. Yellow/green hotspot in upper-left region indicates a putative Tertiary Lymphoid Structure — associated with improved prognosis and immunotherapy response in breast cancer.</div>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--rust);margin:36px 0 14px;">Phase 05–06 · Cell-Cell Communication</h3>
+
+        <div class="method-card reveal" style="--step-c:var(--rust);">
+          <div class="mc-header">
+            <div class="mc-num">07</div>
+            <div class="mc-title">LR Co-expression Scoring — 39 Pairs, Geometric Mean, sq.gr.ligrec (n=500)</div>
+          </div>
+          <div class="mc-body">Computed geometric mean of ligand × receptor expression per spot for 39 curated LR pairs from CellChatDB + NicheNet covering 8 signaling pathways. Validated statistically with 500-permutation test.</div>
+          <div class="mc-why">⚡ Why geometric mean specifically: A ligand-receptor interaction requires BOTH partners to be expressed. Geometric mean (√L×R) equals zero if either partner is absent — it only scores spots where both ligand AND receptor are co-expressed, which is the biological requirement for signaling. Arithmetic mean would score (0+10)/2=5 for a one-sided interaction — biologically meaningless. The 8 pathways (Checkpoint, TGF-β, Angiogenesis, Immune Recruitment, Inflammatory, ECM/Adhesion, Growth Factor, Notch/WNT) cover every major TME communication axis described in breast cancer literature. Permutation testing with 500 iterations generates the null distribution by random spot-label shuffling, providing p-values that account for spatial autocorrelation.</div>
+          <div class="mc-result">✓ 39 LR pairs tested · 8 TME pathways mapped · Key interactions: VEGFA→FLT1 in tumor core (angiogenesis), PD-L1→PD-1 at tumor-stroma boundary (immune checkpoint), COL1A1→ITGA1 in fibrous stroma (ECM remodeling).</div>
+        </div>
+
+        <!-- FIGURE: LR Communication -->
+        <div class="g2 reveal" style="margin:24px 0;">
+          <div class="fig-wrapper">
+            <div class="fig-img-slot" style="min-height:240px;">
+              <!-- ✏️ REPLACE with: <img src="figures/cellcomm/04_LR_bubble_pub.png" alt="LR Bubble Plot"> -->
+              <img src="figures/cellcomm/04_LR_bubble_pub.png" alt="Top 15 LR Interactions Bubble Plot">
+            </div>
+            <div class="fig-meta">
+              <div class="fig-label">Figure 8</div>
+              <div class="fig-caption">Top 15 ligand-receptor pairs × 9 spatial clusters. Bubble size and color encode normalized co-expression score. Mixed Tumor-Stroma cluster shows the broadest LR activity — the most communicatively active interface zone in the TME.</div>
+            </div>
+          </div>
+          <div class="fig-wrapper">
+            <div class="fig-img-slot" style="min-height:240px;">
+              <!-- ✏️ REPLACE with: <img src="figures/cellcomm/05_pathway_activity_pub.png" alt="Pathway Heatmap"> -->
+              <img src="figures/cellcomm/05_pathway_activity_pub.png" alt="TME Pathway Activity Heatmap">
+            </div>
+            <div class="fig-meta">
+              <div class="fig-label">Figure 9 ⭐ Key Figure</div>
+              <div class="fig-caption">8 TME signaling pathways × 9 spatial clusters. Immune Checkpoint and TGF-β both peak at Mixed Tumor-Stroma (score=1.00), directly explaining the immune exclusion phenotype: checkpoint suppression + TGF-β barrier simultaneously active at the tumor boundary.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FIGURE: Signature Heatmap -->
+        <div class="fig-wrapper reveal" style="margin:24px 0;">
+          <div class="fig-img-slot" style="min-height:300px;">
+            <!-- ✏️ REPLACE with: <img src="figures/deconvolution/06_signature_heatmap_pub.png" alt="Signature Heatmap"> -->
+            <img src="figures/deconvolution/06_signature_heatmap_pub.png" alt="Cell Type Signature Heatmap">
+          </div>
+          <div class="fig-meta">
+            <div class="fig-label">Figure 10 · Complete Deconvolution Heatmap</div>
+            <div class="fig-caption">24 cell type signature scores (rows) × 9 spatial clusters (columns). Color intensity encodes normalized score (0–1 per signature). Key patterns: Tumor Epithelial and Luminal A highest in Invasive Carcinoma Core; T/B/NK immune cells concentrated in Mixed Tumor-Stroma; Plasma cells peaking in Endothelial/Vascular cluster (perivascular TLS niche).</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════
+     RESULTS
+══════════════════════════════════ -->
+    <section id="results">
+      <div class="container">
+
+        <div class="sec-eyebrow">04 · Results</div>
+        <h2 class="sec-title reveal">10 Key Biological<br><em>Findings</em></h2>
+        <p class="sec-desc reveal">Each finding supported by statistical evidence and independent spatial visualization.</p>
+
+        <div class="finding-card reveal" style="--fc:var(--teal);">
+          <div class="fc-num">01</div>
+          <div>
+            <div class="fc-title">ER+ Luminal A Subtype Confirmed Spatially</div>
+            <div class="fc-body">Strong ESR1 (estrogen receptor), PGR, and FOXA1 expression concentrated in tumor core spots. Minimal KRT5/KRT14 (basal markers). ERBB2 co-localizes with EPCAM. PAM50 Luminal A score dominant in Invasive Carcinoma Core cluster. This is the most common breast cancer subtype (40–50% of cases), characterized by hormone receptor positivity and generally favorable prognosis.</div>
+            <div class="fc-evidence">Evidence: ESR1 Moran's I significant (FDR&lt;0.05) · Luminal A score max = 10.478 in Carcinoma Core · KRT5 nearly absent confirming non-basal origin · PAM50 spatial mapping confirms luminal identity</div>
+          </div>
+        </div>
+
+        <div class="finding-card reveal" style="--fc:var(--navy);">
+          <div class="fc-num">02</div>
+          <div>
+            <div class="fc-title">9 Spatially Coherent TME Domains at Resolution 0.5</div>
+            <div class="fc-body">Leiden clustering resolved: Invasive Carcinoma Core (EPCAM+ ESR1+), Fibrous Stroma (COL1A1+), Reactive Stroma (VIM+), Mixed Tumor-Stroma, Stromal/CAF-rich, Macrophage-rich (CD68+), Tumor-Stroma Interface, Adipose/Normal Epithelium, and Endothelial/Vascular (PECAM1+).</div>
+            <div class="fc-evidence">Evidence: Cluster 3 (Carcinoma Core) co-occurrence score = 7.5 at short range, confirming tight spatial self-clustering · Neighborhood enrichment diagonal confirms all clusters are most enriched next to themselves · Spatial maps show coherent tissue-level patterns</div>
+          </div>
+        </div>
+
+        <div class="finding-card reveal" style="--fc:var(--plum);">
+          <div class="fc-num">03</div>
+          <div>
+            <div class="fc-title">2,486 Spatially Variable Genes — 11.6% of Transcriptome</div>
+            <div class="fc-body">Moran's I analysis identified 2,486 genes with significantly non-random spatial distribution (FDR&lt;0.05). Top 5 SVGs: MGP (matrix calcification, stromal), IGLC2, IGHG3, IGKC (immunoglobulins — plasma cells), COX6C (mitochondrial — high metabolic tumor cells). Three of the top five are immunoglobulin genes — the first evidence pointing toward a TLS structure.</div>
+            <div class="fc-evidence">Moran's I distribution: Most genes near I=0 (random) · Long right tail represents spatially structured genes · 2,486 significant at FDR&lt;0.05 (BH correction)</div>
+          </div>
+        </div>
+
+        <div class="finding-card reveal" style="--fc:var(--rust);">
+          <div class="fc-num">04</div>
+          <div>
+            <div class="fc-title">⭐ Tertiary Lymphoid Structure (TLS) Signature Detected</div>
+            <div class="fc-body">Spatially concentrated hotspot of immunoglobulin genes (IGLC2, IGHG3, IGKC) co-localizing with plasma cells and B cells in upper-left tissue region. TLS are ectopic lymphoid organs that form in tumors through lymphoid neogenesis. They consist of B cell follicles, T cell zones, and high endothelial venules. Their presence in breast cancer is strongly associated with improved survival and better response to neoadjuvant chemotherapy and immunotherapy (Sautes-Fridman et al., Nature Reviews Cancer, 2019).</div>
+            <div class="fc-evidence">CXCL13→CXCR5 TLS recruitment chemokine detected · Plasma cells maximum score = 20.923 in Endothelial/Vascular cluster (perivascular TLS localization) · B cell + Plasma cell spatial overlap confirms lymphoid aggregate · Top 3 SVGs are immunoglobulins — spatially clustered antibody-producing cells</div>
+          </div>
+        </div>
+
+        <div class="finding-card reveal" style="--fc:var(--olive);">
+          <div class="fc-num">05</div>
+          <div>
+            <div class="fc-title">Immune Exclusion Phenotype — T Cells Blocked at Tumor Boundary</div>
+            <div class="fc-body">All T cell scores (CD3D, CD8A, CD4), B cells, and NK cells concentrated in Mixed Tumor-Stroma boundary cluster — absent from Invasive Carcinoma Core. This "immune excluded" phenotype (one of three TME immune phenotypes: inflamed, excluded, desert) is directly associated with primary resistance to PD-1/PD-L1 checkpoint inhibitors. The spatial separation between immune cells and tumor cells is the defining evidence.</div>
+            <div class="fc-evidence">All immune scores peak in Mixed Tumor-Stroma NOT Carcinoma Core · Immune Checkpoint pathway activity = 1.00 at Mixed Tumor-Stroma boundary · T cell exhaustion markers present — active but unable to infiltrate</div>
+          </div>
+        </div>
+
+        <div class="finding-card reveal" style="--fc:var(--teal);">
+          <div class="fc-num">06</div>
+          <div>
+            <div class="fc-title">Active PD-L1/PD-1 Immune Checkpoint at Tumor-Stroma Interface</div>
+            <div class="fc-body">PD-L1 (CD274) → PD-1 (PDCD1) LR co-expression concentrated at the Mixed Tumor-Stroma boundary. Tumor cells at the invasive front are actively upregulating PD-L1 to suppress infiltrating T cells — a classic adaptive immune resistance mechanism where the tumor responds to immune pressure by activating immunosuppressive signals.</div>
+            <div class="fc-evidence">Immune Checkpoint pathway = 1.00 in Mixed Tumor-Stroma (highest of all clusters) · PD-L1 spatial hotspot confirms protein-level checkpoint activation at tumor boundary · Statistically validated by ligrec permutation test (500 permutations)</div>
+          </div>
+        </div>
+
+        <div class="finding-card reveal" style="--fc:var(--amber);">
+          <div class="fc-num">07</div>
+          <div>
+            <div class="fc-title">TGF-β Immunosuppressive Barrier from Reactive Stroma</div>
+            <div class="fc-body">TGFβ1→TGFBR1/TGFBR2 signaling active in Mixed Tumor-Stroma zone. TGF-β secreted by CAFs creates a physical and molecular barrier — it induces reactive oxygen species, matrix stiffening, and direct T cell exclusion through EMT induction in cancer cells. Combined with PD-L1 checkpoint (Finding 06), this creates a dual immunosuppressive barrier explaining the immune exclusion phenotype mechanistically.</div>
+            <div class="fc-evidence">TGF-β/Stroma pathway = 1.00 in Mixed Tumor-Stroma · COL1A1 signaling dominant in Fibrous Stroma · CAF signature (FAP, ACTA2, POSTN) enriched at reactive stroma boundary</div>
+          </div>
+        </div>
+
+        <div class="finding-card reveal" style="--fc:var(--plum);">
+          <div class="fc-num">08</div>
+          <div>
+            <div class="fc-title">VEGFA-Driven Angiogenesis in Invasive Carcinoma Core</div>
+            <div class="fc-body">VEGFA→KDR and VEGFA→FLT1 co-expression strongest in Invasive Carcinoma Core. Tumor cells drive their own vascular supply through VEGFA secretion — a critical survival mechanism enabling rapid proliferation in an oxygen-limited environment. The spatial localization to the tumor core (not the periphery) indicates active neovascularization within the tumor mass itself.</div>
+            <div class="fc-evidence">Angiogenesis pathway activity highest in Adipose/Normal region (likely pre-existing vasculature) and Invasive Carcinoma Core · VEGFA Moran's I significant · HIF1A/hypoxia signature present in tumor spots</div>
+          </div>
+        </div>
+
+        <div class="finding-card reveal" style="--fc:var(--navy);">
+          <div class="fc-num">09</div>
+          <div>
+            <div class="fc-title">M1 Macrophage Inflammatory Hotspot with IL1B/TNF Signaling</div>
+            <div class="fc-body">Macrophage-rich (CD68+) cluster shows highest Inflammatory (IL1B, TNF, CXCL10) and Growth Factor pathway activity. M1-polarized macrophages in spatially restricted hotspots suggest active anti-tumor inflammation. However, M2 macrophages (CD163, MRC1, TGF-β) also present — M1/M2 polarity in different spatial zones reflects the heterogeneous macrophage landscape characteristic of breast cancer TME.</div>
+            <div class="fc-evidence">Inflammatory pathway = 1.00 in Macrophage-rich cluster · Growth Factor pathway = 1.00 in Macrophage-rich · IL1B→IL1R1 LR interaction concentrated in macrophage-rich region · CD68 confirmed as significant SVG</div>
+          </div>
+        </div>
+
+        <div class="finding-card reveal" style="--fc:var(--rust);">
+          <div class="fc-num">10</div>
+          <div>
+            <div class="fc-title">ECM/Integrin Remodeling Facilitating Invasion</div>
+            <div class="fc-body">ECM/Adhesion pathway most active (score=1.00) in Invasive Carcinoma Core. FN1→ITGB1/ITGA5 fibronectin-integrin signaling active in Reactive Stroma. COL1A1→ITGA1 dominant in Fibrous Stroma. Fibronectin-integrin interactions are established drivers of cancer cell migration — they activate focal adhesion kinase (FAK) signaling promoting EMT, cytoskeletal reorganization, and invasion through the extracellular matrix.</div>
+            <div class="fc-evidence">ECM/Adhesion = 1.00 in Carcinoma Core · COL1A1 ranked #6 top SVG · FN1→ITGB1 + FN1→ITGA5 both in top 15 LR interactions · POSTN (periostin) enriched in reactive stroma — matrix stiffening marker</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════
+     DISCUSSION
+══════════════════════════════════ -->
+    <section id="discussion">
+      <div class="container">
+
+        <div class="sec-eyebrow">05 · Discussion</div>
+        <h2 class="sec-title reveal">Biological Interpretation<br><em>& Clinical Context</em></h2>
+        <p class="sec-desc reveal">What these spatial findings mean for breast cancer biology and precision oncology.</p>
+
+        <div class="g2 reveal" style="margin-bottom:24px;">
+          <div class="card">
+            <div class="card-num" style="color:var(--rust);">Clinical Insight 01</div>
+            <div class="card-title">The Dual Immunosuppressive Barrier</div>
+            <div class="card-body">
+              The co-activation of PD-L1/PD-1 checkpoint (Finding 06) AND TGF-β barrier (Finding 07) at the same spatial zone (Mixed Tumor-Stroma) is mechanistically important. These are not independent — TGF-β from CAFs induces PD-L1 expression on tumor cells, creating a self-reinforcing immunosuppressive loop.
+              <br><br>
+              This explains why PD-1 monotherapy often fails in ER+ breast cancer: blocking PD-1 alone leaves the TGF-β barrier intact. Combination therapy (anti-PD-1 + TGF-β inhibitor) is currently in Phase II clinical trials (NCT04656535) — our spatial data provides direct mechanistic rationale for this approach.
+            </div>
+            <div class="callout rust" style="margin-top:12px;font-size:.82rem;">
+              <strong>Therapeutic implication:</strong> Spatial co-localization of checkpoint + TGF-β → supports combination immunotherapy strategy over monotherapy.
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-num" style="color:var(--teal);">Clinical Insight 02</div>
+            <div class="card-title">TLS as an Endogenous Immune Asset</div>
+            <div class="card-body">
+              The TLS signature (Finding 04) is arguably the most clinically actionable finding. TLS presence in breast cancer is associated with 3-5x improved survival in multiple independent cohorts. They represent endogenous anti-tumor immunity that the tumor has not fully suppressed.
+              <br><br>
+              The spatial co-localization with the immune exclusion zone creates an interesting paradox: the tumor maintains active immunosuppression at its boundary while an immune aggregate forms nearby. This suggests the TLS may be a "failed" infiltration attempt — immune cells organized to attack but physically blocked.
+              <br><br>
+              Spatial transcriptomics is uniquely suited to detect TLS — their organization (follicular B cells, T cell zones, HEVs) requires spatial information that bulk sequencing cannot provide.
+            </div>
+          </div>
+        </div>
+
+        <div class="callout amber reveal" style="font-size:.88rem;">
+          ⚡ <strong>On Statistical Method Selection — Biological Expert Reasoning:</strong> Every analytical choice reflects biological rather than computational thinking. Moran's I was chosen over simple variance because spatial structure is the hypothesis, not variability. Leiden over K-means because cell type boundaries in gene expression space are non-spherical. Geometric mean for LR scoring because signaling requires both partners simultaneously. Permutation testing over parametric tests because count data violates normality. BH-FDR over Bonferroni because we expect a proportion of true positives — Bonferroni overcorrects in genomics. These decisions reflect the reasoning process a computational biologist should articulate in any presentation or interview.
+        </div>
+
+        <div class="g2 reveal" style="margin-top:24px;">
+          <div class="card">
+            <div class="card-num" style="color:var(--ink3);">Limitations</div>
+            <div class="card-title">Honest Assessment</div>
+            <div class="card-body">
+              <strong>Single sample:</strong> All findings are from one patient. Multi-patient validation is required before generalizing to ER+ breast cancer broadly.<br><br>
+              <strong>55µm resolution:</strong> Spots contain ~8 cells — deconvolution approximates cell composition but cannot achieve single-cell precision. Some subtle cell type co-localizations may be missed.<br><br>
+              <strong>Snapshot biology:</strong> Single time point. Pre/post treatment comparisons would reveal therapy-induced TME reprogramming.<br><br>
+              <strong>Correlation not causation:</strong> LR co-expression suggests potential signaling but functional validation is required to confirm causal relationships.
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-num" style="color:var(--ink3);">Methodological Strengths</div>
+            <div class="card-title">What Makes This Rigorous</div>
+            <div class="card-body">
+              <strong>Multiple independent lines of evidence:</strong> TLS detected by SVG analysis, signature scoring, AND LR communication — three independent methods converging on the same finding.<br><br>
+              <strong>Statistical rigor:</strong> Permutation testing for all spatial statistics. BH-FDR for 21,349 simultaneous tests. 500-permutation ligrec validation.<br><br>
+              <strong>Preserved raw counts:</strong> adata.layers['counts'] preserved throughout for Cell2Location compatibility in future work.<br><br>
+              <strong>Biological grounding:</strong> Gene signatures from validated breast cancer atlas (Wu et al. 2021), not generic databases.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════
+     CONCLUSION
+══════════════════════════════════ -->
+    <section id="conclusion">
+      <div class="container">
+
+        <div class="sec-eyebrow">06 · Conclusion</div>
+        <h2 class="sec-title reveal">A Coherent Spatial Story<br><em>of This Tumor</em></h2>
+
+        <div class="callout navy reveal" style="font-size:.92rem;line-height:1.9;margin-bottom:32px;">
+          This spatial transcriptomics analysis reveals a spatially organized ER+ Luminal A invasive ductal carcinoma with an <strong>immune-excluded phenotype</strong>, active desmoplastic stroma, and evidence of <strong>Tertiary Lymphoid Structure</strong> formation. The tumor is encased in a dense fibrous stroma (COL1A1+, VIM+) that, combined with simultaneous TGF-β immunosuppression and PD-L1 checkpoint activation at the tumor-stroma boundary, creates a dual molecular barrier preventing T cell infiltration. Despite this exclusion, spatially concentrated plasma cells and B cells near tumor vasculature suggest ongoing adaptive immune activity — possibly a nascent TLS. The complete spatial communication map identifies VEGFA-driven angiogenesis, ECM-integrin invasion signaling, and CXCL13-mediated immune recruitment as co-occurring processes that together characterize the aggressive yet immunologically active nature of this tumor.
+        </div>
+
+        <div class="g3 reveal">
+          <div class="stat-block" style="text-align:left;padding:20px 22px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:14px;font-weight:500;">By the Numbers</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink2);line-height:2;">
+              4,869 spots analyzed<br>
+              21,349 genes measured<br>
+              9 spatial domains<br>
+              2,486 spatially variable genes<br>
+              24 cell type signatures<br>
+              39 LR pairs analyzed<br>
+              8 signaling pathways<br>
+              7 analysis notebooks
+            </div>
+          </div>
+          <div class="stat-block" style="text-align:left;padding:20px 22px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--navy);margin-bottom:14px;font-weight:500;">Key Biology</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink2);line-height:2;">
+              ER+ Luminal A confirmed ✅<br>
+              TLS signature detected ✅<br>
+              Immune exclusion mapped ✅<br>
+              PD-L1 checkpoint active ✅<br>
+              TGF-β barrier present ✅<br>
+              VEGFA angiogenesis ✅<br>
+              ECM invasion pathway ✅<br>
+              M1 macrophage hotspot ✅
+            </div>
+          </div>
+          <div class="stat-block" style="text-align:left;padding:20px 22px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--rust);margin-bottom:14px;font-weight:500;">Clinical Relevance</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink2);line-height:2;">
+              Immune-excluded → ICI resistance<br>
+              TLS → positive prognosis<br>
+              TGF-β active → combo therapy<br>
+              VEGFA high → anti-VEGF target<br>
+              PD-L1 map → biopsy guide<br>
+              Spatial immune score → stratify patients
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════
+     FUTURE
+══════════════════════════════════ -->
+    <section id="future">
+      <div class="container">
+
+        <div class="sec-eyebrow">07 · Future Directions</div>
+        <h2 class="sec-title reveal">Where This<br><em>Project Goes Next</em></h2>
+
+        <div class="g2 reveal">
+          <div class="card">
+            <div class="card-num">01</div>
+            <div class="card-title">Multi-Patient Cohort with Cell2Location</div>
+            <div class="card-body">Extend to 10+ patients across molecular subtypes. Apply Cell2Location for quantitative cell type deconvolution using the Wu et al. 2021 scRNA-seq reference atlas — providing exact cell proportions per spot rather than scores. Use Harmony for batch correction across samples.</div>
+            <div class="tags"><span class="tag">Cell2Location</span><span class="tag">Harmony</span><span class="tag">scVI</span></div>
+          </div>
+          <div class="card">
+            <div class="card-num">02</div>
+            <div class="card-title">Single-Cell Resolution — Xenium / Visium HD</div>
+            <div class="card-body">Transition to Xenium (subcellular) or Visium HD (2µm) to resolve individual cell identities without deconvolution. Definitively characterize TLS architecture: germinal centers, follicular B cells, HEVs — the spatial hallmarks invisible at 55µm resolution.</div>
+            <div class="tags"><span class="tag">Xenium</span><span class="tag">Visium HD</span><span class="tag">MERFISH</span></div>
+          </div>
+          <div class="card">
+            <div class="card-num">03</div>
+            <div class="card-title">Graph Neural Networks for Spatial Embeddings</div>
+            <div class="card-body">Apply STAGATE, GraphST, or SpaGCN to learn joint representations of gene expression and tissue morphology. Use scGPT or Geneformer foundation models for zero-shot cell type annotation from the spatial data.</div>
+            <div class="tags"><span class="tag">STAGATE</span><span class="tag">GraphST</span><span class="tag">scGPT</span></div>
+          </div>
+          <div class="card">
+            <div class="card-num">04</div>
+            <div class="card-title">Therapeutic Target Validation</div>
+            <div class="card-body">Use CellOracle perturbation modeling to simulate TGF-β blockade — does it restore T cell infiltration computationally? Cross-reference spatial immune score against TCGA-BRCA survival data to test whether the exclusion pattern predicts patient outcome.</div>
+            <div class="tags"><span class="tag">CellOracle</span><span class="tag">TCGA-BRCA</span><span class="tag">NicheNet</span></div>
+          </div>
+          <div class="card">
+            <div class="card-num">05</div>
+            <div class="card-title">Multi-Omics Spatial Integration</div>
+            <div class="card-body">Integrate with spatial proteomics (CODEX, IMC) for protein-level TLS validation. Combine with spatial ATAC-seq to understand chromatin accessibility driving immune exclusion — are immune-regulatory genes accessible in the tumor core?</div>
+            <div class="tags"><span class="tag">CODEX</span><span class="tag">IMC</span><span class="tag">Spatial ATAC</span></div>
+          </div>
+          <div class="card">
+            <div class="card-num">06</div>
+            <div class="card-title">Open Science Publication</div>
+            <div class="card-body">Package as fully reproducible analysis with Snakemake workflow. Upload AnnData objects to Zenodo. Build interactive browser with Vitessce. Write analysis preprint on bioRxiv demonstrating end-to-end spatial transcriptomics workflow with clinical interpretation.</div>
+            <div class="tags"><span class="tag">Zenodo</span><span class="tag">Vitessce</span><span class="tag">bioRxiv</span><span class="tag">Snakemake</span></div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- Closing -->
+        <div style="text-align:center;padding:48px 0 24px;" class="reveal">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--teal);margin-bottom:16px;">Spatial Transcriptomics Project · Complete</div>
+          <h2 style="font-family:'Libre Baskerville',serif;font-size:clamp(2rem,4vw,3rem);color:var(--ink);margin-bottom:14px;">Thank You</h2>
+          <p style="font-size:.92rem;color:var(--ink3);line-height:1.9;margin-bottom:32px;max-width:560px;margin-left:auto;margin-right:auto;">
+            Questions about the methodology, biological findings, or extensions are very welcome.
+            <br>10x Genomics Visium · Python 3.13 · Open Science · Reproducible Research
+          </p>
+          <div style="display:inline-grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);max-width:540px;">
+            <div style="background:var(--white);padding:16px 20px;">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px;">GitHub</div>
+              <div style="font-size:.88rem;color:var(--teal);">github.com/[your-handle]</div>
+            </div>
+            <div style="background:var(--white);padding:16px 20px;">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px;">Email</div>
+              <div style="font-size:.88rem;color:var(--ink2);">[your-email]</div>
+            </div>
+            <div style="background:var(--white);padding:16px 20px;">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px;">Data</div>
+              <div style="font-size:.88rem;color:var(--ink2);">10x Genomics Public</div>
+            </div>
+          </div>
+          <div class="tags" style="justify-content:center;margin-top:24px;">
+            <span class="tag" style="color:var(--teal);border-color:var(--teal);">Scanpy</span>
+            <span class="tag" style="color:var(--navy);border-color:var(--navy);">Squidpy</span>
+            <span class="tag">Moran's I</span>
+            <span class="tag">Leiden</span>
+            <span class="tag">CellChatDB</span>
+            <span class="tag">NicheNet</span>
+            <span class="tag">PROGENy</span>
+            <span class="tag">PAM50</span>
+            <span class="tag">Wu et al. 2021</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <script>
+      // Progress bar
+      window.addEventListener('scroll', () => {
+        const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+        document.getElementById('prog').style.width = pct + '%';
+        document.getElementById('backTop').classList.toggle('show', window.scrollY > 500);
+      });
+
+      // Active nav
+      const secs = document.querySelectorAll('section[id]');
+      const links = document.querySelectorAll('.nav-link');
+      new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+            if (a) a.classList.add('active');
+          }
+        });
+      }, { threshold: 0.25 }).observe && secs.forEach(s =>
+        new IntersectionObserver(entries => {
+          entries.forEach(e => {
+            if (e.isIntersecting) {
+              links.forEach(l => l.classList.remove('active'));
+              const a = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+              if (a) a.classList.add('active');
+            }
+          });
+        }, { threshold: 0.25 }).observe(s)
+      );
+
+      // Reveal on scroll
+      const reveals = document.querySelectorAll('.reveal');
+      const ro = new IntersectionObserver(entries => {
+        entries.forEach((e, i) => {
+          if (e.isIntersecting) {
+            setTimeout(() => e.target.classList.add('visible'), (i % 3) * 60);
+          }
+        });
+      }, { threshold: 0.08 });
+      reveals.forEach(r => ro.observe(r));
+    </script>
+  </body>
+</html>
