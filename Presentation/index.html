@@ -936,54 +936,6 @@
     </section>
 
     <!-- ══════════════════════════════════
-     HOW TO ADD YOUR FIGURES
-══════════════════════════════════ -->
-    <section id="figure-guide" style="padding:40px 0;background:var(--white);">
-      <div class="container">
-        <div class="guide-panel">
-          <div class="guide-title">📌 How To Add Your Generated Figures To This Presentation</div>
-          <div class="guide-steps">
-            <div class="guide-step">
-              <strong>OPTION A — Local (Recommended)</strong><br>
-              Put your figure files in the <strong>same folder</strong> as this HTML file,
-              then find each placeholder and replace it with an img tag.
-              <div class="guide-code">
-                <span class="gc">&lt;!-- FIND this block: --&gt;</span><br>
-                &lt;div class="fig-placeholder"&gt;<br>
-                &nbsp;&nbsp;...fig-placeholder-text...<br>
-                &lt;/div&gt;<br><br>
-                <span class="gc">&lt;!-- REPLACE with: --&gt;</span><br>
-                &lt;img <span class="gh">src</span>=<span class="ga">"your_figure.png"</span><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="gh">alt</span>=<span class="ga">"Figure description"</span>&gt;
-              </div>
-            </div>
-            <div class="guide-step">
-              <strong>OPTION B — Vercel Deployment</strong><br>
-              Create a folder called <strong>figures/</strong> next to this HTML.
-              Put figures there. Reference as <code style="color:var(--teal)">src=&quot;figures/qc_violin.png&quot;</code>
-              <div class="guide-code">
-                my-project/<br>
-                ├── <span class="gh">index.html</span> &nbsp;← this file<br>
-                └── figures/<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="ga">qc_violin.png</span><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="ga">spatial_clusters.png</span><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="ga">umap_annotated.png</span><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;└── <span class="ga">pathway_heatmap.png</span><br><br>
-                <span class="gc"># Then reference as:</span><br>
-                src=<span class="ga">"figures/qc_violin.png"</span>
-              </div>
-            </div>
-          </div>
-          <div style="margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink3);line-height:1.8;">
-            💡 Each figure slot below shows the <span style="color:var(--teal);background:var(--teal-lt);padding:1px 6px;">exact filename</span> from your project.
-            Just copy those files next to this HTML and update the src= attribute.
-            All placeholders are clearly marked — search for <code style="background:var(--bg2);padding:1px 6px;">fig-placeholder</code> in the HTML to find every slot.
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ══════════════════════════════════
      OVERVIEW
 ══════════════════════════════════ -->
     <section id="overview">
