@@ -14,6 +14,7 @@
 This project performs a comprehensive **spatial transcriptomics analysis** of human breast cancer tissue using the **10x Genomics Visium** platform. By combining whole-transcriptome gene expression with spatial coordinates, we map the cellular landscape of the **tumor microenvironment (TME)** directly onto tissue histology.
 
 Unlike bulk RNA-seq, spatial transcriptomics reveals *where* genes are expressed — distinguishing tumor cores from invasive margins, stromal regions, and immune infiltrates — all within a single tissue section.
+
 Project Link: https://spatial-biology.vercel.app/ 
 ---
 
